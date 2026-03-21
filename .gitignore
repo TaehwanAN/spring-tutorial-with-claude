@@ -12,9 +12,6 @@ target/
 .project
 .settings/
 
-# VS Code
-.vscode/
-
 # OS
 .DS_Store
 Thumbs.db
