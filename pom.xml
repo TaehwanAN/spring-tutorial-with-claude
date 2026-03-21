@@ -7,7 +7,7 @@
 		<artifactId>spring-boot-starter-parent</artifactId>
 		<version>4.0.4</version>
 	</parent>
-	<groupId>com.demo</groupId>
+	<groupId>com.demo.myapplication</groupId>
 	<artifactId>my-spring-tutorial</artifactId>
 	<version>0.0.9-MY-SNAPSHOT</version>
 	<!-- artifactId & version: 이 태그들을 기준으로 jar 파일이 생성된다. 예시) target/my-spring-tutorial-0.0.1-SNAPSHOT.jar -->
@@ -16,7 +16,7 @@
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-webmvc</artifactId>
+			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
 	</dependencies>
 	
