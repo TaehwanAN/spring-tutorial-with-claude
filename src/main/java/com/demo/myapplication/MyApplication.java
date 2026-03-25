@@ -2,6 +2,7 @@ package com.demo.myapplication; // 만약 패키지 선언 없는 경우, 디폴
 
 import org.springframework.boot.Banner;
 import org.springframework.boot.SpringApplication;
+import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import com.demo.myapplication.global.configuration.listener.application.BeforeStartApplicationListeners;
@@ -35,14 +36,44 @@ public class MyApplication {
 		application.setBannerMode(Banner.Mode.OFF);
 		application.run(args); */
 
-        // Application Event Listener 사용을 위한 SpringBoot 로딩
         SpringApplication app = new SpringApplication(MyApplication.class);
+
+        // Application Event Listener 사용을 위한 SpringBoot 로딩
         app.addListeners(
             new BeforeStartApplicationListeners.StartingEventListener()
             , new BeforeStartApplicationListeners.EnvironmentPreparedEventListener()
             , new BeforeStartApplicationListeners.ContextInitializedEventListener()
             , new BeforeStartApplicationListeners.ApplicationPreparedEventListener()
         );
+
+        // Web Environment Type Setting
+        app.setWebApplicationType(WebApplicationType.SERVLET);
+        /* Spring MVC 발견시 Default. WebFlux와 MVC 동시발견시 Default. 
+        작동 방식: Thread-per-request 모델. 요청마다 스레드를 할당하며, DB 작업 등이 끝날 때까지 스레드가 기다립니다(Blocking).
+        Use Case (언제 쓰나요?)
+        전형적인 기업용 시스템 (ERP, 그룹웨어): 트래픽이 예측 가능하고 안정적인 처리가 중요할 때.
+        표준 웹 애플리케이션: 쇼핑몰, 게시판, 관리자 페이지 등 대부분의 일반적인 웹 서비스.
+        풍부한 라이브러리 지원이 필요할 때: JPA(Hibernate) 등 기존의 수많은 블로킹 방식 라이브러리를 그대로 사용하고 싶을 때.
+        */
+        
+        // app.setWebApplicationType(WebApplicationType.REACTIVE);
+        /* Spring WebFlux 발견시 Default. 
+        작동 방식: Event-loop 모델. 적은 수의 스레드로 수만 개의 동시 접속을 효율적으로 처리합니다(Non-blocking).
+        Use Case (언제 쓰나요?)
+        고동시성(High Concurrency) 환경: 실시간 채팅, 주식 시황 중계, 실시간 알림 시스템.
+        API 게이트웨이(Spring Cloud Gateway): 수많은 마이크로서비스로 요청을 전달만 하고 응답을 기다려야 하는 중계 역할.
+        스트리밍 서비스: 대용량 데이터를 조금씩 계속 내려보내야 하는 넷플릭스 같은 스트리밍 API.
+        */
+
+        // app.setWebApplicationType(WebApplicationType.NONE);
+        /* 
+        작동 방식: 서버(Tomcat/Netty)를 실행하지 않고, 컨텍스트 내부의 빈(Bean)들만 초기화하여 로직을 실행합니다.
+        Use Case (언제 쓰나요?)
+        배치(Batch) 애플리케이션: 매일 밤 12시에 전날 매출 데이터를 정산하여 DB에 저장하는 작업.
+        CLI(Command Line Interface) 도구: 터미널에서 명령어를 입력하면 특정 작업을 수행하고 종료되는 프로그램.
+        단순 스케줄러: 주기적으로 특정 파일을 삭제하거나 서버 상태를 체크하는 백그라운드 프로세스.
+         */
+
         app.run(args);
 	}
 }
