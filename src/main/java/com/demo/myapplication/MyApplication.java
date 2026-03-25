@@ -1,5 +1,6 @@
 package com.demo.myapplication; // 만약 패키지 선언 없는 경우, 디폴트 패키지에 속함. 그러나 명시적으로 패키지를 선언해주는 것이 일반관행. 
 
+import org.springframework.boot.Banner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
@@ -26,5 +27,10 @@ public class MyApplication {
         5. HTTP 서버 오픈 - localhost:8080
         */
 		SpringApplication.run(MyApplication.class, args);
+
+        // Customizing Spring App In a Code (Also, possible with application.properties and application.yml)
+        /* SpringApplication application = new SpringApplication(MyApplication.class);
+		application.setBannerMode(Banner.Mode.OFF);
+		application.run(args); */
 	}
 }
