@@ -1,3 +1,7 @@
+# Custom Files
+.notes/
+.vscode/
+
 # Maven build output
 target/
 .jar
