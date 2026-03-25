@@ -1,4 +1,3 @@
 spring:
   main:
-    lazy-initialization:true
-    
+    lazy-initialization: true

@@ -8,7 +8,7 @@
     <parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>4.0.4</version>
+		<version>3.2.4</version> <!-- Actuator 사용을 위한 버젼 변경: 4.0.4 -> 3.2.4 -->
 	</parent>
 	<groupId>com.demo.myapplication</groupId>
 	<artifactId>my-spring-tutorial</artifactId>
@@ -26,6 +26,10 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-devtools</artifactId>
 			<optional>true</optional> <!-- 반드시 포함해야함. 개발환경에서만 devtool 사용하게 해줌. -->
+		</dependency>
+		<dependency> <!-- 어플리케이션 가용성(App Availability) 모니터링을 위한 의존성(Liveliness + Readiness) -->
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-actuator</artifactId>
 		</dependency>
 	</dependencies>
 	

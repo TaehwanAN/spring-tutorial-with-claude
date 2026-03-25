@@ -1,4 +1,21 @@
 spring:
   main:
     banner-mode: console
-    
+
+# Config: Actuator
+management:
+  endpoint:
+    health:
+      show-details: always # 운영-> when_authorized + Spring Security
+      probes:
+        enabled: true   # 중요 (Spring Boot 2.3+)
+      group:
+        readiness:
+          include: simple # 클래스명이 SimpleHealthIndicator라면 Bean 이름은 simpleHealthIndicator
+          show-details: always # 운영-> when_authorized + Spring Security
+        liveness:
+          include: livenessState
+  endpoints:
+    web:
+      exposure:
+        include: health
