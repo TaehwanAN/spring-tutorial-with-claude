@@ -4,6 +4,8 @@ import org.springframework.boot.Banner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
+import com.demo.myapplication.global.configuration.listener.application.BeforeStartApplicationListeners;
+
 /*@SpringBootApplication = meta-annotation
 1. @SpringBootConfiguration: Spring 설정 클래스
 2. @EnableAutoConfiguration: Spring Boot의 핵심 - classpath에 있는 라이브러리 기반으로 자동 설정
@@ -26,11 +28,21 @@ public class MyApplication {
         4. 내장 톰캣 실행 - Embedded Tomcat start
         5. HTTP 서버 오픈 - localhost:8080
         */
-		SpringApplication.run(MyApplication.class, args);
+		// SpringApplication.run(MyApplication.class, args);
 
         // Customizing Spring App In a Code (Also, possible with application.properties and application.yml)
         /* SpringApplication application = new SpringApplication(MyApplication.class);
 		application.setBannerMode(Banner.Mode.OFF);
 		application.run(args); */
+
+        // Application Event Listener 사용을 위한 SpringBoot 로딩
+        SpringApplication app = new SpringApplication(MyApplication.class);
+        app.addListeners(
+            new BeforeStartApplicationListeners.StartingEventListener()
+            , new BeforeStartApplicationListeners.EnvironmentPreparedEventListener()
+            , new BeforeStartApplicationListeners.ContextInitializedEventListener()
+            , new BeforeStartApplicationListeners.ApplicationPreparedEventListener()
+        );
+        app.run(args);
 	}
 }
