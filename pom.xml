@@ -18,6 +18,12 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
+		<!-- spring-boot-devtools -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-devtools</artifactId>
+			<optional>true</optional> <!-- 반드시 포함해야함. 개발환경에서만 devtool 사용하게 해줌. -->
+		</dependency>
 	</dependencies>
 	
 	<!-- build: 실행가능한 jar를 만들기 위한 부분 -->
@@ -29,4 +35,5 @@
 			</plugin>
 		</plugins>
 	</build>
+	
 </project>
