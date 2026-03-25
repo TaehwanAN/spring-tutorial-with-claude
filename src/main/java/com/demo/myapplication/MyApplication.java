@@ -2,13 +2,18 @@ package com.demo.myapplication; // 만약 패키지 선언 없는 경우, 디폴
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 
 /*@SpringBootApplication = meta-annotation
 1. @SpringBootConfiguration: Spring 설정 클래스
 2. @EnableAutoConfiguration: Spring Boot의 핵심 - classpath에 있는 라이브러리 기반으로 자동 설정
 3. @ComponentScan: Bean 자동 등록 - 현재 패키지 기준으로 하위 패키지 스캔 */
+
+/*
+특정 configuration은 배제하는 방법
+@SpringBootApplication(
+    exclude = { DataSourceAutoConfiguration.class }
+)
+ */
 
 @SpringBootApplication // 루트 패키지(<groupId>com.demo.myapplication</groupId>)에 속해주어야, @ComponentScan 과 EnableAutoConfiguration의 기본 스캔 범위가 그 하위 패키지들로 정의됨. 스캔 대상 com.demo.myapplication.*
 public class MyApplication {

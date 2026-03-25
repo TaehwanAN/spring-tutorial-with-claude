@@ -1,6 +1,3 @@
-# Custom directories
-.debug/
-
 # Maven build output
 target/
 .jar
