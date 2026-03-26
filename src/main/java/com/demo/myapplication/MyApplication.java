@@ -5,6 +5,7 @@ import org.springframework.boot.ExitCodeGenerator;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.context.metrics.buffering.BufferingApplicationStartup;
 import org.springframework.context.annotation.Bean;
 
 import com.demo.myapplication.global.configuration.listener.application.BeforeStartApplicationListeners;
@@ -57,6 +58,19 @@ public class MyApplication {
 		application.run(args); */
 
         SpringApplication app = new SpringApplication(MyApplication.class);
+
+        // Application Startup Tracking을 통한 성능 지표 확인
+        app.setApplicationStartup(new BufferingApplicationStartup(2048)); // BufferingApplicationStartup 설정 (최대 2048개의 단계를 버퍼링)
+        /*
+        bash: $ java -XX:StartFlightRecording:filename=recording.jfr,duration=10s -jar demo.jar
+        --> .jfr 파일 생성되며 JDK Mission Control(JMC) 라는 툴로 시각적 분석 가능
+        
+        Spring Boot에서 제공하는 BufferingApplicationStartup은 메모리에 시작 단계들을 임시로 저장합니다.
+        Actuator 연동: management.endpoint.startup.enabled=true 설정을 통해 HTTP 엔드포인트를 열면, GET /actuator/startup 호출 시 애플리케이션이 시작될 때 걸린 시간과 단계를 JSON 형태로 반환합니다.
+        활용: CI/CD 파이프라인에서 배포 후 애플리케이션의 시작 성능이 이전 버전보다 저하되지 않았는지 체크하는 자동화 도구에 활용하기 매우 좋습니다.
+
+        일반적인 로컬 개발 환경에서는 크게 필요하지 않을 수 있습니다. 하지만 **클라우드 환경(Kubernetes 등)**에서 애플리케이션의 **Startup Latency(시작 지연)**가 문제가 되어 Liveness/Readiness Probe가 실패하는 경우, 이 도구들을 사용하여 어떤 부분에서 병목이 생기는지 정확히 진단할 수 있습니다.
+        */
 
         // Application Event Listener 사용을 위한 SpringBoot 로딩
         app.addListeners(

@@ -18,7 +18,10 @@ management:
           show-details: always # 운영-> when_authorized + Spring Security
         liveness:
           include: livenessState
+    startup:
+      enabled: true # curl -X POST http://localhost:8080/actuator/startup # 참고: startup 엔드포인트는 단순히 조회(GET)만 하는 것이 아니라, 버퍼링된 데이터를 "소비(Drain)"하는 개념이 포함될 수 있어 주로 POST 메서드를 사용합니다.
+
   endpoints:
     web:
       exposure:
-        include: health
+        include: "health,info,startup" # BufferingApplicationStartup 설정 추가
