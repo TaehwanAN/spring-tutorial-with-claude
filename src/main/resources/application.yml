@@ -1,6 +1,9 @@
 spring:
   main:
     banner-mode: console
+  application:
+    admin:
+      enabled: true # 터미널에서 jconsole로 접속가능.
 
 # Config: Actuator
 management:
