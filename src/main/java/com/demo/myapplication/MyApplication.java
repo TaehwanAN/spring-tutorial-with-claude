@@ -1,9 +1,11 @@
 package com.demo.myapplication; // 만약 패키지 선언 없는 경우, 디폴트 패키지에 속함. 그러나 명시적으로 패키지를 선언해주는 것이 일반관행. 
 
 import org.springframework.boot.Banner;
+import org.springframework.boot.ExitCodeGenerator;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Bean;
 
 import com.demo.myapplication.global.configuration.listener.application.BeforeStartApplicationListeners;
 
@@ -21,6 +23,24 @@ import com.demo.myapplication.global.configuration.listener.application.BeforeSt
 
 @SpringBootApplication // 루트 패키지(<groupId>com.demo.myapplication</groupId>)에 속해주어야, @ComponentScan 과 EnableAutoConfiguration의 기본 스캔 범위가 그 하위 패키지들로 정의됨. 스캔 대상 com.demo.myapplication.*
 public class MyApplication {
+
+    // 종료 코드로 42를 반환하는 예시
+    /*
+    보통 웹 서버보다는 배치(Batch) 애플리케이션이나 CLI 도구에서 주로 사용합니다.
+    이렇게 숫자를 지정해두면, 쉘 스크립트나 CI/CD 파이프라인(Jenkins, GitHub Actions 등)에서 $? 변수를 통해 이전 단계가 왜 실패했는지 판단하고 후속 처리를 할 수 있습니다
+    단순히 빈으로 등록하는 것 외에, 커스텀 예외에 이 인터페이스를 구현하면 매우 깔끔한 에러 처리가 가능합니다.
+    public class DataNotFoundException extends RuntimeException implements ExitCodeGenerator {
+    @Override
+    public int getExitCode() {
+            return 80; // 데이터가 없을 때의 특정 종료 코드
+        }
+    }
+    */
+    @Bean
+    public ExitCodeGenerator exitCodeGenerator(){
+        return () -> 42;
+    }
+
 	public static void main(String[] args) {
         /*Java의 표준 entry point, SpringApplication.run() 호출
         1. Spring ApplicationContext 생성 - IoC Container 생성
