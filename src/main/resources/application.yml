@@ -4,6 +4,9 @@ spring:
   # application:
   #   admin:
   #     enabled: true # 터미널에서 jconsole로 접속가능. 그러나 현대에는 Actuator를 쓰던가, Prometheus + Grafana 사용한다.
+  # threads:
+  #   virtual:
+  #     enabled: true # 가상 쓰레드 사용(사용 전 반드시 문서 확인해보고 사용여부 검토)
 
 # Config: Actuator
 management:
