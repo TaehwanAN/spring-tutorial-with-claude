@@ -28,27 +28,27 @@ public class AfterStartApplicationListeners {
   @EventListener
   public void onApplicationStarted(ApplicationStartedEvent event) {
     System.out.println("##### [5] ApplicationStartedEvent: App Started #####");
-    System.out.println(event);
+    System.out.println(event.toString());
   }
 
   // 6. AvailabilityChangeEvent (LivenessState.CORRECT): 쿠버네티스(Kubernetes) 환경에서 매우 중요합니다. 애플리케이션의 내부 상태가 '정상적으로 살아있음'을 외부(Liveness Probe)에 알립니다.
   @EventListener
   public void onLivenessChange(AvailabilityChangeEvent<LivenessState> event) {
     System.out.println("##### [6] LivenessState Changed: " + event.getState());
-    System.out.println(event);
+    System.out.println(event.toString());
   }
 
   // 7. ApplicationReadyEvent: (중요) CommandLineRunner나 ApplicationRunner까지 모두 실행 완료된 완벽한 준비 상태입니다. 사용자의 요청을 처리할 수 있는 상태이며, 배포 완료 알림(Slack, Email 등)을 보내거나 본격적인 캐시 워밍업(Cache Warm-up)을 하기에 가장 좋은 시점입니다.
   @EventListener
   public void onApplicationReady(ApplicationReadyEvent event) {
     System.out.println("(##### [7] ApplicationReadyEvent Received");
-    System.out.println(event);
+    System.out.println(event.toString());
   }
 
   // 8. AvailabilityChangeEvent (ReadinessState.ACCEPTING_TRAFFIC): 쿠버네티스의 Readiness Probe와 연동되어, 이제 라우터나 로드밸런서로부터 트래픽을 받아도 된다고 알립니다.
   @EventListener
   public void onReadinessChange(AvailabilityChangeEvent<ReadinessState> event) {
     System.out.println("(\"##### [8] ReadinessState Changed: " + event.getState());
-    System.out.println(event);
+    System.out.println(event.toString());
   }
 }

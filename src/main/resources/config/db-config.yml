@@ -1,0 +1,25 @@
+# DB 모듈 설정
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    
+
+---
+spring:
+  config:
+    activate:
+      on-profile: "prod"
+  datasource:
+    hikari:
+      maximum-pool-size: 100
+---
+spring:
+  config:
+    activate:
+      on-profile: "dev"
+  datasource:
+    hikari:
+      maximum-pool-size: 10

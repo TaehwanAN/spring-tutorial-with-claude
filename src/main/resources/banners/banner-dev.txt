@@ -1,0 +1,9 @@
+${AnsiColor.BRIGHT_GREEN}
+ __  __ __   __   ____   _____  __  __  ___  
+|  \/  |\ \ / /  |  _ \ | ____||  \/  |/ _ \ 
+| |\/| | \ V /   | | | ||  _|  | |\/| | | | |
+| |  | |  | |    | |_| || |___ | |  | | |_| |
+|_|  |_|  |_|    |____/ |_____||_|  |_|\___/  [DEV MODE]
+
+${application.title}: ${application.version}
+Spring Boot: ${spring-boot.version}

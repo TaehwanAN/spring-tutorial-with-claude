@@ -2,13 +2,14 @@
 
 spring:
   profiles:
-    active: "dev" # 기본값으로 dev 활성화 (CLI 인자로 변경 가능)
-
+    default: "dev"
+  config:
+    import:  # 모듈 임포트
+      - "optional:classpath:config/db-config.yml"
+      - "optional:classpath:config/api-config.yml"
+      - "optional:classpath:config/batch-config.yml"
   main:
     banner-mode: console
-
-server:
-  port: 8888
 
 # 공통 비즈니스 로직에 쓰이는 값
 my:
@@ -28,3 +29,49 @@ management:
     health:
       probes:
         enabled: true
+
+---
+spring:
+  config:
+    activate:
+      on-profile: "prod"
+  banner:
+    location: "classpath:banners/banner-prod.txt"
+server:
+  tomcat:
+    threads:
+      max: 200
+  port: 9090
+
+management:
+  endpoint:
+    health:
+      show-details: when_authorized # 보안을 위해 인증된 사용자만 상세 정보 확인
+
+logging:
+  level:
+    root: WARN # 운영은 중요한 경고/에러만 남김
+    # com.yourpackage.app: INFO # 우리 팀 코드는 INFO까지
+
+---
+spring:
+  config:
+    activate:
+      on-profile: "dev"
+  banner:
+    location: "classpath:banners/banner-dev.txt"
+
+debug: true
+
+server:
+  port: 9999
+
+management:
+  endpoint:
+    health:
+      show-details: always
+
+# logging:
+#   level:
+#     root: DEBUG # 개발 시에는 SQL 쿼리나 상세 흐름을 보기 위해 DEBUG
+#     # org.springframework: INFO # 스프링 프레임워크 로그는 너무 많으니 INFO로 조절

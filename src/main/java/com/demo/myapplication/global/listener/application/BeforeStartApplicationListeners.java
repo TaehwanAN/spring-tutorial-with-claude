@@ -14,7 +14,7 @@ public class BeforeStartApplicationListeners {
     @Override
     public void onApplicationEvent(@SuppressWarnings("null") ApplicationStartingEvent event){
       System.out.println("##### [1] ApplicationStartingEvent: App Started (No Context exists) #####");
-      System.out.println(event);
+      System.out.println(event.toString());
     }
   }
   
@@ -23,7 +23,8 @@ public class BeforeStartApplicationListeners {
     @Override
     public void onApplicationEvent(@SuppressWarnings("null") ApplicationEnvironmentPreparedEvent event){
       System.out.println("##### [2] ApplicationEnvironmentPreparedEvent: Environment Preaparation Done #####");
-      System.out.println(event);
+      System.out.println(event.toString());
+      System.out.println(event.getEnvironment());
     }
   }
 
@@ -32,7 +33,7 @@ public class BeforeStartApplicationListeners {
     @Override
     public void onApplicationEvent(@SuppressWarnings("null") ApplicationContextInitializedEvent event){
       System.out.println("##### [3] ApplicationContextInitializedEvent: Context Initialized(Before Loading Beans) #####");
-      System.out.println(event);
+      System.out.println(event.toString());
     }
   }
 
@@ -41,7 +42,7 @@ public class BeforeStartApplicationListeners {
     @Override
     public void onApplicationEvent(@SuppressWarnings("null") ApplicationPreparedEvent event){
       System.out.println("##### [4] ApplicationPreparedEvent: Bean Definition Loaded #####");
-      System.out.println(event);
+      System.out.println(event.toString());
     }
   }
 
