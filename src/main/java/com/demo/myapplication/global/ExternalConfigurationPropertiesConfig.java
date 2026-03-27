@@ -1,4 +1,4 @@
-package com.demo.myapplication.global.configuration;
+package com.demo.myapplication.global;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
