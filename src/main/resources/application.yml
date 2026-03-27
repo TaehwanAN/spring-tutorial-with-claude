@@ -1,8 +1,11 @@
 # 이 파일은 애플리케이션의 엔트리 포인트 역할을 합니다. 공통 설정과 어떤 프로파일을 활성화할지 결정합니다.
 
 spring:
-  profiles:
+  profiles: # 커맨드 라인 인자가 application.yml 파일보다 우선순위가 높습니다. 따라서 파일에 dev라고 적혀 있어도, 서버 실행 시 --spring.profiles.active=prod를 주면 prod가 활성화됩니다.
     default: "dev"
+    # include:
+    # - "common"
+    # - "prod"
   config:
     import:  # 모듈 임포트
       - "optional:classpath:config/db-config.yml"
