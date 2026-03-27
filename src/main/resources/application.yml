@@ -35,3 +35,16 @@ management:
     web:
       exposure:
         include: "health,info,startup" # BufferingApplicationStartup 설정 추가
+
+my:
+  secret: ${random.value}
+  uuid: ${random.uuid}
+  long: ${random.long}
+
+mail: # @ConfigurationProperties 예시
+  host: smtp.example.com
+  port: 587
+  auth-enabled: true
+  credentials:
+    username: admin
+    password: secret-password
