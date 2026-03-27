@@ -1,4 +1,4 @@
-package com.demo.myapplication.global.configuration.listener.application;
+package com.demo.myapplication.global.listener.application;
 
 import org.springframework.boot.context.event.ApplicationContextInitializedEvent;
 import org.springframework.boot.context.event.ApplicationEnvironmentPreparedEvent;

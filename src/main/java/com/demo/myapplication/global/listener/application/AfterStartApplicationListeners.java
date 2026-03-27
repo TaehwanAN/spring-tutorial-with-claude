@@ -1,4 +1,4 @@
-package com.demo.myapplication.global.configuration.listener.application;
+package com.demo.myapplication.global.listener.application;
 
 import org.springframework.boot.availability.AvailabilityChangeEvent;
 import org.springframework.boot.availability.LivenessState;

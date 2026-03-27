@@ -1,10 +1,7 @@
 # 6번째로 적용되는 설정 파일(우선순위: 6): ./src/main/resources/application.yml
-# v 5번째로 적용되는 설정 파일(우선순위: 5): ./src/main/resources/application-{profile}.yml
+# 5번째로 적용되는 설정 파일(우선순위: 5): ./src/main/resources/application-{profile}.yml
 # 4번째로 적용되는 설정 파일(우선순위: 4): ./application.yml
 # 3번째로 적용되는 설정 파일(우선순위: 3): ./appliction-{profile}.yml
 # 2번째로 적용되는 설정 파일(우선순위: 2): ./config/application.yml
-# 1번째로 적용되는 설정 파일(우선순위: 1): ./config/application-{profile}.yml
+# v 1번째로 적용되는 설정 파일(우선순위: 1): ./config/application-{profile}.yml
 
-spring:
-  main:
-    lazy-initialization: true

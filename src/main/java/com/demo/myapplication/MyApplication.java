@@ -8,7 +8,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.metrics.buffering.BufferingApplicationStartup;
 import org.springframework.context.annotation.Bean;
 
-import com.demo.myapplication.global.configuration.listener.application.BeforeStartApplicationListeners;
+import com.demo.myapplication.global.listener.application.BeforeStartApplicationListeners;
 
 /*@SpringBootApplication = meta-annotation
 1. @SpringBootConfiguration: Spring 설정 클래스

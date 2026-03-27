@@ -1,12 +1,12 @@
-package com.demo.myapplication.global.configuration;
+package com.demo.myapplication.global;
 
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.stereotype.Component;
 
 @Component
-public class ApplicationArgumentsConfig {
+public class ApplicationArgumentsLoader {
 
-  public ApplicationArgumentsConfig(ApplicationArguments appArgs){
+  public ApplicationArgumentsLoader(ApplicationArguments appArgs){
     System.err.println("##### Application's Arguments ######");
     // ApplicationArguments: [str]
     System.err.println(appArgs.toString()); 

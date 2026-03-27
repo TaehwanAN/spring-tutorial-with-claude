@@ -1,4 +1,4 @@
-package com.demo.myapplication.global.configuration;
+package com.demo.myapplication.global;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -8,7 +8,7 @@ import org.springframework.beans.factory.DisposableBean;
 import org.springframework.stereotype.Component;
 
 @Component
-public class DisposableBeanConfig implements DisposableBean {
+public class ApplicationShutdownDisposableBean implements DisposableBean {
 
   private final ExecutorService executor = Executors.newFixedThreadPool(5);
 
