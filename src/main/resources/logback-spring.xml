@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  logback-spring.xml (logback.xml 이 아닌 logback-spring.xml 을 사용하는 이유)
+  ─────────────────────────────────────────────────────────────────────────
+  logback.xml        → JVM이 직접 로드. Spring 환경(Environment/Profile) 정보가
+                       아직 존재하지 않아 <springProfile>, <springProperty> 사용 불가.
+
+  logback-spring.xml → Spring Boot가 로드를 가로채어(intercept) 처리.
+                       <springProfile> : 활성 프로파일 조건 분기 가능
+                       <springProperty> : application.yml 값을 Logback 변수로 바인딩 가능
+  ─────────────────────────────────────────────────────────────────────────
+-->
+<configuration>
+
+  <!--
+    ══════════════════════════════════════════════════════════════════════
+    [1] springProperty: Spring Environment → Logback 변수 바인딩
+    ══════════════════════════════════════════════════════════════════════
+    application.yml 의 spring.application.name 값을 APP_NAME 변수로 가져온다.
+    source 속성에는 application.yml 키를 그대로 쓴다. (kebab-case 호환)
+    defaultValue: application.yml 에 해당 키가 없을 때 폴백값.
+  -->
+  <springProperty scope="context" name="APP_NAME"
+                  source="spring.application.name"
+                  defaultValue="spring-tutorial"/>
+
+  <!--
+    ══════════════════════════════════════════════════════════════════════
+    [2] 공통 패턴 변수 정의
+    ══════════════════════════════════════════════════════════════════════
+    %X{key:-기본값} : MDC(Mapped Diagnostic Context) 값 출력.
+                      값이 없으면 기본값(-) 표시.
+
+    traceId / spanId:
+      HTTP 요청 처리 중에는 micrometer-tracing-bridge-otel 이 OTel SDK를 통해
+      생성한 TraceContext 를 MDC 에 자동 주입함.
+      → 요청 로그에 trace_id 가 자동 포함되어 분산 추적(Distributed Tracing)과 연동 가능.
+
+      CommandLineRunner 등 HTTP 요청 외 컨텍스트에서는 자동 주입되지 않으므로
+      MDC.put() 으로 직접 주입 (FirstCommandLineRunnerConfig 참고).
+  -->
+  <property name="CONSOLE_PATTERN"
+            value="%d{HH:mm:ss.SSS} [%thread] %highlight(%-5level) %cyan(%logger{36}) [trace=%X{traceId:-},span=%X{spanId:-}] - %msg%n"/>
+
+  <property name="FILE_PATTERN"
+            value="%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} [trace=%X{traceId:-},span=%X{spanId:-}] - %msg%n"/>
+
+  <!--
+    ══════════════════════════════════════════════════════════════════════
+    [3] dev 프로파일 설정
+    ══════════════════════════════════════════════════════════════════════
+    <springProfile> 태그: logback-spring.xml 에서만 동작하는 Spring Boot 확장.
+    name 속성에 프로파일명을 쓴다. "dev | test" 처럼 OR 조건도 가능.
+
+    [dev 전략]
+    - CONSOLE Appender : 색상 패턴으로 터미널 가독성 향상
+    - DEV_FILE Appender: 날짜별 단순 롤링 (압축 없음, 빠른 I/O)
+    - root level=INFO, 우리 패키지는 DEBUG
+  -->
+  <springProfile name="dev">
+
+    <!-- ── ConsoleAppender ── -->
+    <!--
+      ConsoleAppender: System.out(기본) 또는 System.err 로 출력.
+      target 기본값은 System.out.
+
+      PatternLayoutEncoder: 지정한 패턴 문자열로 로그를 포매팅하는 인코더.
+      %highlight() : 로그 레벨에 따라 ANSI 색상 적용
+        ERROR → 빨간색, WARN → 노란색, INFO → 기본, DEBUG → 파란색
+      %cyan()     : 지정 텍스트에 cyan 색상 적용 (logger 이름)
+    -->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+      <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+        <pattern>${CONSOLE_PATTERN}</pattern>
+        <charset>UTF-8</charset>
+      </encoder>
+    </appender>
+
+    <!-- ── RollingFileAppender (TimeBasedRollingPolicy) ── -->
+    <!--
+      RollingFileAppender: 조건에 따라 로그 파일을 교체(롤링)하는 Appender.
+
+      TimeBasedRollingPolicy: 시간 기준 롤링 정책.
+        fileNamePattern : 롤오버 시 생성될 파일 이름 패턴.
+                          %d{yyyy-MM-dd} → 날짜 토큰 (매일 자정 롤오버)
+        maxHistory      : 보관할 롤오버 파일 최대 개수.
+                          7 → 최근 7일치만 보관, 그 이전 파일은 자동 삭제.
+    -->
+    <appender name="DEV_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+      <file>logs/dev/app.log</file>
+      <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+        <fileNamePattern>logs/dev/app.%d{yyyy-MM-dd}.log</fileNamePattern>
+        <maxHistory>7</maxHistory>
+      </rollingPolicy>
+      <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+        <pattern>${FILE_PATTERN}</pattern>
+        <charset>UTF-8</charset>
+      </encoder>
+    </appender>
+
+    <!-- ── Logger 설정 ── -->
+    <!--
+      <logger>    : 특정 패키지/클래스의 로그 레벨을 개별 지정.
+                    additivity="false" 이면 root logger 로 전파하지 않음.
+                    (기본값 true → root 의 appender 에도 중복 출력됨)
+      <root>      : 모든 logger 의 최상위 부모. 여기서 설정한 level 이
+                    명시적 <logger> 가 없는 모든 클래스에 적용됨.
+    -->
+    <logger name="com.demo.myapplication" level="DEBUG" additivity="false">
+      <appender-ref ref="CONSOLE"/>
+      <appender-ref ref="DEV_FILE"/>
+    </logger>
+
+    <root level="INFO">
+      <appender-ref ref="CONSOLE"/>
+      <appender-ref ref="DEV_FILE"/>
+    </root>
+
+  </springProfile>
+
+  <!--
+    ══════════════════════════════════════════════════════════════════════
+    [4] prod 프로파일 설정
+    ══════════════════════════════════════════════════════════════════════
+    [prod 전략]
+    - PROD_FILE Appender  : SizeAndTimeBasedRollingPolicy (크기+날짜 복합 롤링)
+                            .log.gz 압축으로 디스크 절약
+    - OTEL_JSON_FILE Appender: LogstashEncoder → OTel traceId/spanId 포함 JSON 구조화 로그
+    - root level=WARN, 우리 패키지는 INFO
+    - 콘솔 출력 없음 (운영 서버에서는 파일만)
+  -->
+  <springProfile name="prod">
+
+    <!-- ── RollingFileAppender (SizeAndTimeBasedRollingPolicy) ── -->
+    <!--
+      SizeAndTimeBasedRollingPolicy: 날짜 + 파일 크기 복합 롤링 정책.
+        fileNamePattern : %i 토큰은 동일 날짜 내 인덱스 (0, 1, 2 …)
+                          .gz 확장자 → Logback이 자동으로 gzip 압축
+        maxFileSize     : 단일 파일이 이 크기를 초과하면 즉시 롤오버
+        maxHistory      : 롤오버 파일 최대 보관 개수 (일 단위)
+        totalSizeCap    : 모든 아카이브 파일 크기의 합계 상한
+    -->
+    <appender name="PROD_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+      <file>logs/prod/app.log</file>
+      <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+        <fileNamePattern>logs/prod/app.%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
+        <maxFileSize>50MB</maxFileSize>
+        <maxHistory>30</maxHistory>
+        <totalSizeCap>5GB</totalSizeCap>
+      </rollingPolicy>
+      <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+        <pattern>${FILE_PATTERN}</pattern>
+        <charset>UTF-8</charset>
+      </encoder>
+    </appender>
+
+    <!-- ── OpenTelemetry 방식 JSON Structured Logging Appender ── -->
+    <!--
+      LogstashEncoder (net.logstash.logback:logstash-logback-encoder):
+        각 로그 이벤트를 JSON 한 줄(NDJSON)로 직렬화하는 인코더.
+
+      OTel과의 연동 흐름:
+        1. HTTP 요청 진입 → Spring MVC가 Observation 생성
+        2. micrometer-tracing-bridge-otel 이 OTel SDK 를 통해 Span 시작
+        3. MDCScopeDecorator 가 traceId / spanId 를 현재 스레드의 MDC 에 주입
+        4. 로그 기록 시 LogstashEncoder 가 MDC 전체를 최상위 JSON 필드로 포함
+        5. 결과 JSON 파일 → Filebeat / Fluentd → ELK·PLG 등 백엔드로 전달
+
+      출력 예시 (HTTP 요청 처리 중):
+      {
+        "@timestamp": "2026-03-28T18:00:00.000+00:00",
+        "@version":   "1",
+        "message":    "요청 처리 완료",
+        "logger_name":"com.demo.myapplication.web.SomeController",
+        "thread_name":"http-nio-9090-exec-1",
+        "level":      "INFO",
+        "level_value": 20000,
+        "traceId":    "4bf92f3577b34da6a3ce929d0e0e4736",  <- OTel trace ID (MDC 자동 주입)
+        "spanId":     "00f067aa0ba902b7"                   <- OTel span ID (MDC 자동 주입)
+      }
+
+      출력 예시 (CommandLineRunner 등 OTel 컨텍스트가 없을 때):
+      {
+        "@timestamp": "...",
+        "message":    "First Command Line Runner 실행",
+        "traceId":    "runner-001",    <- MDC.put()으로 직접 주입한 값
+        "spanId":     "-"              <- 없으면 기본값
+      }
+
+      이 JSON 파일을 Elasticsearch나 Loki로 보내면 traceId 로 분산 추적과 연결 가능.
+      (Jaeger/Grafana Tempo 에 저장된 Trace와 동일한 traceId를 공유)
+    -->
+    <appender name="OTEL_JSON_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+      <file>logs/prod/app-otel.json</file>
+      <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+        <fileNamePattern>logs/prod/app-otel.%d{yyyy-MM-dd}.%i.json.gz</fileNamePattern>
+        <maxFileSize>50MB</maxFileSize>
+        <maxHistory>30</maxHistory>
+        <totalSizeCap>5GB</totalSizeCap>
+      </rollingPolicy>
+      <!--
+        LogstashEncoder: MDC 에 있는 모든 키-값을 JSON 최상위 필드로 자동 포함.
+        별도 필드 지정 없이 traceId, spanId 가 OTel bridge에 의해 MDC에 들어오면
+        JSON 결과물에 자동으로 나타남.
+      -->
+      <encoder class="net.logstash.logback.encoder.LogstashEncoder">
+        <customFields>{"service.name":"${APP_NAME}"}</customFields>
+      </encoder>
+    </appender>
+
+    <logger name="com.demo.myapplication" level="INFO" additivity="false">
+      <appender-ref ref="PROD_FILE"/>
+      <appender-ref ref="OTEL_JSON_FILE"/>
+    </logger>
+
+    <root level="WARN">
+      <appender-ref ref="PROD_FILE"/>
+      <appender-ref ref="OTEL_JSON_FILE"/>
+    </root>
+
+  </springProfile>
+
+</configuration>

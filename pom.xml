@@ -31,6 +31,30 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-actuator</artifactId>
 		</dependency>
+		<!--
+		  OpenTelemetry 방식 분산 추적 + 구조화 로깅
+		  ─────────────────────────────────────────────────────────────────
+		  micrometer-tracing-bridge-otel
+		    : Micrometer Tracing(Spring Boot 표준 계측 API)을 OTel SDK 위에서 동작하도록 연결.
+		      HTTP 요청 등 Spring MVC Observation이 발생할 때 traceId / spanId 를
+		      자동으로 MDC 에 주입 → 로그 패턴의 %X{traceId}, %X{spanId} 로 출력됨.
+		      Spring Boot 3.2.x BOM이 버전을 관리하므로 <version> 태그 불필요.
+
+		  logstash-logback-encoder
+		    : 각 로그 이벤트를 JSON 한 줄로 직렬화하는 Logback Encoder.
+		      MDC 에 있는 traceId / spanId 를 최상위 JSON 필드로 자동 포함.
+		      Elasticsearch(ELK), Loki(PLG), Splunk 등 어떤 백엔드에도 연결 가능.
+		      Spring Boot 3.2.x / Logback 1.4.x 와 호환되는 7.4 버전 사용.
+		-->
+		<dependency>
+			<groupId>io.micrometer</groupId>
+			<artifactId>micrometer-tracing-bridge-otel</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>net.logstash.logback</groupId>
+			<artifactId>logstash-logback-encoder</artifactId>
+			<version>7.4</version>
+		</dependency>
 	</dependencies>
 	
 	<!-- build: 실행가능한 jar를 만들기 위한 부분 -->

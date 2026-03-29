@@ -1,6 +1,8 @@
 # 이 파일은 애플리케이션의 엔트리 포인트 역할을 합니다. 공통 설정과 어떤 프로파일을 활성화할지 결정합니다.
 
 spring:
+  application:
+    name: spring-tutorial  # logback-spring.xml 의 <springProperty> 로 APP_NAME 변수에 바인딩됨
   profiles: # 커맨드 라인 인자가 application.yml 파일보다 우선순위가 높습니다. 따라서 파일에 dev라고 적혀 있어도, 서버 실행 시 --spring.profiles.active=prod를 주면 prod가 활성화됩니다.
     default: "dev"
     # include:
@@ -32,6 +34,12 @@ management:
     health:
       probes:
         enabled: true
+  # OpenTelemetry / Micrometer Tracing 설정
+  # micrometer-tracing-bridge-otel 이 classpath 에 있을 때 자동으로 OTel SDK 를 구성함.
+  # sampling.probability: 0.0(추적 안 함) ~ 1.0(모든 요청 추적). 운영에서는 0.1~0.2 권장.
+  tracing:
+    sampling:
+      probability: 1.0
 
 ---
 spring:
@@ -52,9 +60,14 @@ management:
       show-details: when_authorized # 보안을 위해 인증된 사용자만 상세 정보 확인
 
 logging:
+  # logback-spring.xml 이 있으면 아래 설정도 반영되지만, XML 설정이 우선.
+  # XML 에서 <logger> 로 세밀하게 제어하고, 여기서는 보조적으로 사용.
   level:
-    root: WARN # 운영은 중요한 경고/에러만 남김
-    # com.yourpackage.app: INFO # 우리 팀 코드는 INFO까지
+    root: WARN                          # 운영은 중요한 경고/에러만 남김
+    "[com.demo.myapplication]": INFO    # 우리 패키지는 INFO
+  file:
+    path: logs/prod                     # logging.file.path → Spring이 app.log 를 이 경로에 생성
+                                        # (logback-spring.xml 의 OTEL_JSON_FILE 경로와 별개임. 학습용 참고)
 
 ---
 spring:
@@ -74,7 +87,9 @@ management:
     health:
       show-details: always
 
-# logging:
-#   level:
-#     root: DEBUG # 개발 시에는 SQL 쿼리나 상세 흐름을 보기 위해 DEBUG
-#     # org.springframework: INFO # 스프링 프레임워크 로그는 너무 많으니 INFO로 조절
+logging:
+  # logback-spring.xml 의 <springProfile name="dev"> 가 먼저 적용됨.
+  # application.yml 의 logging.level 은 XML 설정을 오버라이드 가능 (보조 수단).
+  level:
+    root: INFO
+    "[com.demo.myapplication]": DEBUG   # 우리 패키지는 DEBUG (SQL, 흐름 파악)
