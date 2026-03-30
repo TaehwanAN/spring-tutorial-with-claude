@@ -17,6 +17,9 @@ spring:
     basename: "messages/messages"  # classpath:messages/messages*.properties
     encoding: UTF-8
     fallback-to-system-locale: false  # 미지원 locale은 messages.properties(기본/영어)로 fallback
+  mvc:
+    problemdetails:
+      enabled: true   # RFC 9457 ProblemDetail 활성화: Spring MVC 내장 예외(MethodArgumentNotValidException 등)를 표준 형식으로 응답
   main:
     banner-mode: console
     keep-alive: true  # 가상 스레드는 모두 데몬 스레드 → 스케줄링만 있는 앱에서 JVM 조기 종료 방지
@@ -99,10 +102,17 @@ spring:
       # pool:
       #   size: 2               # 스케줄러 스레드 수 (가상 스레드 비활성화 시 조정)
       thread-name-prefix: "scheduling-"
+  lifecycle:
+    timeout-per-shutdown-phase: 30s  # Graceful Shutdown 유예 기간: 진행 중인 요청 완료를 기다리는 최대 시간
+  web:
+    resources:
+      cache:
+        period: 0   # 개발 환경: 정적 리소스 캐시 비활성화 (브라우저 새로고침 시 항상 최신 파일 로드)
 
 debug: true
 
 server:
+  shutdown: graceful   # 진행 중인 요청을 모두 완료한 후 종료 (즉시 종료: immediate)
   port: 9999
 
 management:

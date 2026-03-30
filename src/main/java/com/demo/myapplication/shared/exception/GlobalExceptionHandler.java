@@ -6,12 +6,15 @@ import com.demo.myapplication.shared.api.ErrorCode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.MessageSource;
+import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.util.Locale;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * 전역 예외 처리.
@@ -40,6 +43,30 @@ public class GlobalExceptionHandler {
         return ResponseEntity
                 .status(errorCode.getHttpStatus())
                 .body(ApiResponse.error(errorCode, message));
+    }
+
+    /**
+     * Spring MVC 검증 실패 예외를 RFC 9457 ProblemDetail 형식으로 처리한다.
+     *
+     * <p>혼합 전략: 도메인 예외({@link BusinessException})는 {@code ApiResponse<Void>}로,
+     * Spring MVC 표준 예외({@link MethodArgumentNotValidException})는 {@code ProblemDetail}로 반환한다.</p>
+     *
+     * <p>{@code spring.mvc.problemdetails.enabled=true} 설정과 함께,
+     * Spring Boot가 자동 등록하는 {@code ProblemDetailsExceptionHandler}보다
+     * {@code @RestControllerAdvice}의 구체적 핸들러가 우선 평가되므로
+     * 이 메서드가 먼저 호출된다.</p>
+     */
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ProblemDetail handleValidation(MethodArgumentNotValidException e) {
+        String fieldErrors = e.getBindingResult().getFieldErrors().stream()
+                .map(fe -> fe.getField() + ": " + fe.getDefaultMessage())
+                .collect(Collectors.joining(", "));
+        log.warn("입력 검증 실패: {}", fieldErrors);
+
+        ProblemDetail problem = ProblemDetail.forStatus(e.getStatusCode());
+        problem.setTitle("Validation Failed");
+        problem.setDetail(fieldErrors);
+        return problem;
     }
 
     @ExceptionHandler(IllegalArgumentException.class)

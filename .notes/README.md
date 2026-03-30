@@ -41,10 +41,36 @@ Spring Boot Reference 공식 문서 구조에 맞춰 정리한 학습 노트입�
 - [task-execution.md](07-task-execution-and-scheduling/task-execution.md) — AsyncTaskExecutor 자동 설정, 커스텀 executor 패턴 4종, 빈 해석 우선순위
 - [task-scheduling.md](07-task-execution-and-scheduling/task-scheduling.md) — @Scheduled 트리거 3종, ThreadPoolTaskScheduler 설정, 가상 스레드 주의사항
 
+## 08-web-applications/ — 웹 애플리케이션
+
+### 01-servlet/ — Servlet Web Applications
+- [01-mvc-auto-configuration.md](08-web-applications/01-servlet/01-mvc-auto-configuration.md) — WebMvcAutoConfiguration, WebMvcConfigurer vs @EnableWebMvc
+- [02-http-message-converters.md](08-web-applications/01-servlet/02-http-message-converters.md) — HttpMessageConverter 체인, Jackson 통합 및 커스터마이징
+- [03-static-content.md](08-web-applications/01-servlet/03-static-content.md) — 정적 리소스 서빙, Cache Busting, WebJars
+- [04-error-handling.md](08-web-applications/01-servlet/04-error-handling.md) — BasicErrorController 흐름, @ExceptionHandler, RFC 9457 ProblemDetail
+- [05-cors.md](08-web-applications/01-servlet/05-cors.md) — Preflight 흐름, @CrossOrigin vs addCorsMappings() 전역 설정
+- [06-filters-servlets-listeners.md](08-web-applications/01-servlet/06-filters-servlets-listeners.md) — FilterRegistrationBean, OncePerRequestFilter, DispatcherType
+- [07-path-matching.md](08-web-applications/01-servlet/07-path-matching.md) — PathPatternParser vs AntPathMatcher, ContentNegotiationManager
+- [08-functional-routing.md](08-web-applications/01-servlet/08-functional-routing.md) — RouterFunction DSL, WebMvc.fn, @Controller와 공존
+
+### 02-reactive/ — Reactive Web Applications
+- [01-webflux-overview.md](08-web-applications/02-reactive/01-webflux-overview.md) — Mono/Flux, WebFluxConfigurer, 가상 스레드 vs WebFlux 비교
+- [02-codecs.md](08-web-applications/02-reactive/02-codecs.md) — HttpMessageReader/Writer, CodecCustomizer, 버퍼 크기 설정
+- [03-error-handling.md](08-web-applications/02-reactive/03-error-handling.md) — ErrorWebExceptionHandler, AbstractErrorWebExceptionHandler
+- [04-web-filters.md](08-web-applications/02-reactive/04-web-filters.md) — WebFilter 구현, @Order 순서 제어, doFinally() 패턴
+
+### 기타
+- [03-graceful-shutdown.md](08-web-applications/03-graceful-shutdown.md) — server.shutdown=graceful, timeout-per-shutdown-phase, K8s 연동
+- [04-security/01-default-security.md](08-web-applications/04-security/01-default-security.md) — 자동 설정, SecurityFilterChain, UserDetailsService
+- [04-security/02-mvc-webflux-security.md](08-web-applications/04-security/02-mvc-webflux-security.md) — HttpSecurity, @EnableMethodSecurity, 접근 규칙
+- [04-security/03-oauth2.md](08-web-applications/04-security/03-oauth2.md) — OAuth2 Client/Resource Server/Authorization Server, SAML 2.0
+- [05-graphql.md](08-web-applications/05-graphql.md) — 스키마 설정, @QueryMapping, DataFetcherExceptionResolver, GraphiQL
+- [06-hateoas.md](08-web-applications/06-hateoas.md) — EntityModel, CollectionModel, WebMvcLinkBuilder, HAL 형식
+
 ## features/ — 개별 기능 (미적용, 추후 참고용)
 - [kotlin.md](features/kotlin.md) — Kotlin 지원: runApplication, null-safety, data class 바인딩, MockK 테스트
 - [ssl.md](features/ssl.md) — SSL 번들: JKS/PEM 방식, Hot Reload (Tomcat/Netty), SslBundles 빈
 
 ---
 
-> 향후 추가 예정: `08-web-applications/`, `09-data-access/`, `10-security/` ...
+> 향후 추가 예정: `09-data-access/`, `10-security/` ...
