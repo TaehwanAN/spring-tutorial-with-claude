@@ -1,11 +1,14 @@
 package com.demo.myapplication; // 만약 패키지 선언 없는 경우, 디폴트 패키지에 속함. 그러나 명시적으로 패키지를 선언해주는 것이 일반관행. 
 
 import org.springframework.boot.Banner;
+import org.springframework.boot.ExitCodeGenerator;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.context.metrics.buffering.BufferingApplicationStartup;
+import org.springframework.context.annotation.Bean;
 
-import com.demo.myapplication.global.configuration.listener.application.BeforeStartApplicationListeners;
+import com.demo.myapplication.global.lifecycle.BeforeStartApplicationListeners;
 
 /*@SpringBootApplication = meta-annotation
 1. @SpringBootConfiguration: Spring 설정 클래스
@@ -21,6 +24,24 @@ import com.demo.myapplication.global.configuration.listener.application.BeforeSt
 
 @SpringBootApplication // 루트 패키지(<groupId>com.demo.myapplication</groupId>)에 속해주어야, @ComponentScan 과 EnableAutoConfiguration의 기본 스캔 범위가 그 하위 패키지들로 정의됨. 스캔 대상 com.demo.myapplication.*
 public class MyApplication {
+
+    // 종료 코드로 42를 반환하는 예시
+    /*
+    보통 웹 서버보다는 배치(Batch) 애플리케이션이나 CLI 도구에서 주로 사용합니다.
+    이렇게 숫자를 지정해두면, 쉘 스크립트나 CI/CD 파이프라인(Jenkins, GitHub Actions 등)에서 $? 변수를 통해 이전 단계가 왜 실패했는지 판단하고 후속 처리를 할 수 있습니다
+    단순히 빈으로 등록하는 것 외에, 커스텀 예외에 이 인터페이스를 구현하면 매우 깔끔한 에러 처리가 가능합니다.
+    public class DataNotFoundException extends RuntimeException implements ExitCodeGenerator {
+    @Override
+    public int getExitCode() {
+            return 80; // 데이터가 없을 때의 특정 종료 코드
+        }
+    }
+    */
+    @Bean
+    public ExitCodeGenerator exitCodeGenerator(){
+        return () -> 42;
+    }
+
 	public static void main(String[] args) {
         /*Java의 표준 entry point, SpringApplication.run() 호출
         1. Spring ApplicationContext 생성 - IoC Container 생성
@@ -37,6 +58,19 @@ public class MyApplication {
 		application.run(args); */
 
         SpringApplication app = new SpringApplication(MyApplication.class);
+
+        // Application Startup Tracking을 통한 성능 지표 확인
+        app.setApplicationStartup(new BufferingApplicationStartup(2048)); // BufferingApplicationStartup 설정 (최대 2048개의 단계를 버퍼링)
+        /*
+        bash: $ java -XX:StartFlightRecording:filename=recording.jfr,duration=10s -jar demo.jar
+        --> .jfr 파일 생성되며 JDK Mission Control(JMC) 라는 툴로 시각적 분석 가능
+        
+        Spring Boot에서 제공하는 BufferingApplicationStartup은 메모리에 시작 단계들을 임시로 저장합니다.
+        Actuator 연동: management.endpoint.startup.enabled=true 설정을 통해 HTTP 엔드포인트를 열면, GET /actuator/startup 호출 시 애플리케이션이 시작될 때 걸린 시간과 단계를 JSON 형태로 반환합니다.
+        활용: CI/CD 파이프라인에서 배포 후 애플리케이션의 시작 성능이 이전 버전보다 저하되지 않았는지 체크하는 자동화 도구에 활용하기 매우 좋습니다.
+
+        일반적인 로컬 개발 환경에서는 크게 필요하지 않을 수 있습니다. 하지만 **클라우드 환경(Kubernetes 등)**에서 애플리케이션의 **Startup Latency(시작 지연)**가 문제가 되어 Liveness/Readiness Probe가 실패하는 경우, 이 도구들을 사용하여 어떤 부분에서 병목이 생기는지 정확히 진단할 수 있습니다.
+        */
 
         // Application Event Listener 사용을 위한 SpringBoot 로딩
         app.addListeners(

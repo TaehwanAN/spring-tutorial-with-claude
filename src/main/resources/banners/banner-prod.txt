@@ -1,0 +1,10 @@
+${AnsiColor.BRIGHT_RED}
+ __  __ __   __   ____   _____  __  __  ___  
+|  \/  |\ \ / /  |  _ \ | ____||  \/  |/ _ \ 
+| |\/| | \ V /   | | | ||  _|  | |\/| | | | |
+| |  | |  | |    | |_| || |___ | |  | | |_| |
+|_|  |_|  |_|    |____/ |_____||_|  |_|\___/  [PROD MODE]
+
+⚠️  WARNING: PRODUCTION ENVIRONMENT ⚠️
+${application.title}: ${application.version}
+Spring Boot: ${spring-boot.version}

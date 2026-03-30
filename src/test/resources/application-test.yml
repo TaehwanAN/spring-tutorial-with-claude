@@ -1,0 +1,12 @@
+spring:
+  main:
+    banner-mode: off
+  config:
+    import:  # 테스트 시 외부 설정 파일 비활성화
+      - "optional:classpath:config/api-config.yml"
+      - "optional:classpath:config/batch-config.yml"
+
+logging:
+  level:
+    root: WARN
+    "[com.demo.myapplication]": INFO

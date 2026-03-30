@@ -1,21 +1,118 @@
+# 이 파일은 애플리케이션의 엔트리 포인트 역할을 합니다. 공통 설정과 어떤 프로파일을 활성화할지 결정합니다.
+
 spring:
+  application:
+    name: spring-tutorial  # logback-spring.xml 의 <springProperty> 로 APP_NAME 변수에 바인딩됨
+  profiles: # 커맨드 라인 인자가 application.yml 파일보다 우선순위가 높습니다. 따라서 파일에 dev라고 적혀 있어도, 서버 실행 시 --spring.profiles.active=prod를 주면 prod가 활성화됩니다.
+    default: "dev"
+    # include:
+    # - "common"
+    # - "prod"
+  config:
+    import:  # 모듈 임포트
+      - "optional:classpath:config/db-config.yml"
+      - "optional:classpath:config/api-config.yml"
+      - "optional:classpath:config/batch-config.yml"
+  messages:
+    basename: "messages/messages"  # classpath:messages/messages*.properties
+    encoding: UTF-8
+    fallback-to-system-locale: false  # 미지원 locale은 messages.properties(기본/영어)로 fallback
   main:
     banner-mode: console
+    keep-alive: true  # 가상 스레드는 모두 데몬 스레드 → 스케줄링만 있는 앱에서 JVM 조기 종료 방지
+  threads:
+    virtual:
+      enabled: true   # Java 21 가상 스레드 활성화 (Tomcat, @Async, Scheduler 모두 적용)
 
-# Config: Actuator
+# 공통 비즈니스 로직에 쓰이는 값
+my:
+  secret: ${random.value}
+  uuid: ${random.uuid}
+  long: ${random.long}
+
+# Actuator 기본 노출 설정
 management:
-  endpoint:
-    health:
-      show-details: always # 운영-> when_authorized + Spring Security
-      probes:
-        enabled: true   # 중요 (Spring Boot 2.3+)
-      group:
-        readiness:
-          include: simple # 클래스명이 SimpleHealthIndicator라면 Bean 이름은 simpleHealthIndicator
-          show-details: always # 운영-> when_authorized + Spring Security
-        liveness:
-          include: livenessState
   endpoints:
     web:
       exposure:
-        include: health
+        include: "health,info,startup"
+  endpoint:
+    startup:
+      enabled: true
+    health:
+      probes:
+        enabled: true
+  # OpenTelemetry / Micrometer Tracing 설정
+  # micrometer-tracing-bridge-otel 이 classpath 에 있을 때 자동으로 OTel SDK 를 구성함.
+  # sampling.probability: 0.0(추적 안 함) ~ 1.0(모든 요청 추적). 운영에서는 0.1~0.2 권장.
+  tracing:
+    sampling:
+      probability: 1.0
+
+---
+spring:
+  config:
+    activate:
+      on-profile: "prod"
+  banner:
+    location: "classpath:banners/banner-prod.txt"
+server:
+  # tomcat.threads.max: 가상 스레드 활성화 시 Tomcat이 가상 스레드를 사용하므로 이 설정은 무시됨
+  # threads:
+  #   max: 200
+  port: 9090
+
+management:
+  endpoint:
+    health:
+      show-details: when_authorized # 보안을 위해 인증된 사용자만 상세 정보 확인
+
+logging:
+  # logback-spring.xml 이 있으면 아래 설정도 반영되지만, XML 설정이 우선.
+  # XML 에서 <logger> 로 세밀하게 제어하고, 여기서는 보조적으로 사용.
+  level:
+    root: WARN                          # 운영은 중요한 경고/에러만 남김
+    "[com.demo.myapplication]": INFO    # 우리 패키지는 INFO
+  file:
+    path: logs/prod                     # logging.file.path → Spring이 app.log 를 이 경로에 생성
+                                        # (logback-spring.xml 의 OTEL_JSON_FILE 경로와 별개임. 학습용 참고)
+
+---
+spring:
+  config:
+    activate:
+      on-profile: "dev"
+  banner:
+    location: "classpath:banners/banner-dev.txt"
+  # 태스크 실행 및 스케줄링 설정 (spring.task.execution.* / spring.task.scheduling.*)
+  # 가상 스레드 활성화 시: pool.* 설정은 무시되고 SimpleAsyncTaskExecutor/SimpleAsyncTaskScheduler로 자동 전환됩니다.
+  # 가상 스레드 비활성화 시: 아래 pool 설정이 ThreadPoolTaskExecutor/ThreadPoolTaskScheduler에 적용됩니다.
+  task:
+    execution:
+      # pool:
+      #   core-size: 4          # 기본 유지 스레드 수
+      #   max-size: 8           # 최대 스레드 수 (queue 포화 시 증가)
+      #   queue-capacity: 50    # 대기열 크기 (초과 시 max-size까지 스레드 생성)
+      #   keep-alive: "10s"     # 유휴 스레드 유지 시간
+      thread-name-prefix: "async-"
+    scheduling:
+      # pool:
+      #   size: 2               # 스케줄러 스레드 수 (가상 스레드 비활성화 시 조정)
+      thread-name-prefix: "scheduling-"
+
+debug: true
+
+server:
+  port: 9999
+
+management:
+  endpoint:
+    health:
+      show-details: always
+
+logging:
+  # logback-spring.xml 의 <springProfile name="dev"> 가 먼저 적용됨.
+  # application.yml 의 logging.level 은 XML 설정을 오버라이드 가능 (보조 수단).
+  level:
+    root: INFO
+    "[com.demo.myapplication]": DEBUG   # 우리 패키지는 DEBUG (SQL, 흐름 파악)

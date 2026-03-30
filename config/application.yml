@@ -1,0 +1,19 @@
+# 설정파일 불러오는 우선순위: jar 외부에 있을 수록, 프로파일이 구체적일 수록 높다. 그러나 현대적인 적용방식을 참고하라
+# 6번째로 적용되는 설정 파일(우선순위: 6): ./src/main/resources/application.yml
+# 5번째로 적용되는 설정 파일(우선순위: 5): ./src/main/resources/application-{profile}.yml
+# 4번째로 적용되는 설정 파일(우선순위: 4): ./application.yml
+# 3번째로 적용되는 설정 파일(우선순위: 3): ./appliction-{profile}.yml
+# v 2번째로 적용되는 설정 파일(우선순위: 2): ./config/application.yml
+# 1번째로 적용되는 설정 파일(우선순위: 1): ./config/application-{profile}.yml
+
+# 현대적인 적용방식: application.yml의 위치 (./config, ./, classpath:/)는 계층을 구분하고, 각 application.yml 문서를 논리적으로 구분하여 프로파일을 불러오는 방식
+# my-app/
+# ├── config/                  # (외무 설정) 실행 시점에 가장 높은 우선순위
+# │   └── application.yml      # 운영 서버 전용 최상위 설정
+# ├── src/main/resources/      # (내부 설정) JAR에 포함됨
+# │   ├── application.yml      # 기본 설정 및 프로파일 활성화 제어(단일 물리문서를 논리적으로 구분함)
+# │   └── db-config.yml        # 공통 DB 모듈 (임포트 대상)
+# └── target/my-app.jar
+
+
+    
