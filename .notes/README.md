@@ -37,6 +37,14 @@ Spring Boot Reference 공식 문서 구조에 맞춰 정리한 학습 노트입�
 ## 06-json/ — JSON
 - [json.md](06-json/json.md) — Jackson / Gson / JSON-B 자동 설정 및 커스터마이징
 
+## 07-task-execution-and-scheduling/ — 태스크 실행 및 스케줄링
+- [task-execution.md](07-task-execution-and-scheduling/task-execution.md) — AsyncTaskExecutor 자동 설정, 커스텀 executor 패턴 4종, 빈 해석 우선순위
+- [task-scheduling.md](07-task-execution-and-scheduling/task-scheduling.md) — @Scheduled 트리거 3종, ThreadPoolTaskScheduler 설정, 가상 스레드 주의사항
+
+## features/ — 개별 기능 (미적용, 추후 참고용)
+- [kotlin.md](features/kotlin.md) — Kotlin 지원: runApplication, null-safety, data class 바인딩, MockK 테스트
+- [ssl.md](features/ssl.md) — SSL 번들: JKS/PEM 방식, Hot Reload (Tomcat/Netty), SslBundles 빈
+
 ---
 
-> 향후 추가 예정: `07-web-applications/`, `08-data-access/`, `09-security/` ...
+> 향후 추가 예정: `08-web-applications/`, `09-data-access/`, `10-security/` ...
