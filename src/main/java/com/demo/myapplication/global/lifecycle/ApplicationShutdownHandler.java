@@ -1,4 +1,4 @@
-package com.demo.myapplication.global;
+package com.demo.myapplication.global.lifecycle;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -10,9 +10,9 @@ import org.springframework.beans.factory.DisposableBean;
 import org.springframework.stereotype.Component;
 
 @Component
-public class ApplicationShutdownDisposableBean implements DisposableBean {
+public class ApplicationShutdownHandler implements DisposableBean {
 
-  private static final Logger log = LoggerFactory.getLogger(ApplicationShutdownDisposableBean.class);
+  private static final Logger log = LoggerFactory.getLogger(ApplicationShutdownHandler.class);
 
   private final ExecutorService executor = Executors.newFixedThreadPool(5);
 

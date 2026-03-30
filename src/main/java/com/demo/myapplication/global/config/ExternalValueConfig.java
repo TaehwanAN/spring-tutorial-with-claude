@@ -1,4 +1,4 @@
-package com.demo.myapplication.global;
+package com.demo.myapplication.global.config;
 
 import java.util.UUID;
 

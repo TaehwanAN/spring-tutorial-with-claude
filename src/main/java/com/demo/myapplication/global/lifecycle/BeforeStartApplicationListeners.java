@@ -1,4 +1,4 @@
-package com.demo.myapplication.global.listener.application;
+package com.demo.myapplication.global.lifecycle;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
