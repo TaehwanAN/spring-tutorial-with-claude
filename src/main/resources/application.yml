@@ -14,7 +14,7 @@ spring:
       - "optional:classpath:config/api-config.yml"
       - "optional:classpath:config/batch-config.yml"
   messages:
-    basename: "messages"           # classpath:messages*.properties
+    basename: "messages/messages"  # classpath:messages/messages*.properties
     encoding: UTF-8
     fallback-to-system-locale: false  # 미지원 locale은 messages.properties(기본/영어)로 fallback
   main:

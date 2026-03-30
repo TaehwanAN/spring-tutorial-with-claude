@@ -34,6 +34,9 @@ Spring Boot Reference 공식 문서 구조에 맞춰 정리한 학습 노트입�
 - [logging.md](05-logging/logging.md) — Logback 설정 가이드
 - [modern-logging-system.md](05-logging/modern-logging-system.md) — 분산 로깅 + OpenTelemetry
 
+## 06-json/ — JSON
+- [json.md](06-json/json.md) — Jackson / Gson / JSON-B 자동 설정 및 커스터마이징
+
 ---
 
-> 향후 추가 예정: `06-json/`, `07-web-applications/`, `08-data-access/`, `09-security/` ...
+> 향후 추가 예정: `07-web-applications/`, `08-data-access/`, `09-security/` ...
